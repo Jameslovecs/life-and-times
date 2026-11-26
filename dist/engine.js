@@ -4,4 +4,11 @@ export function validDate(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;cons
 export function ageAt(birth,date){let a=Number(date.slice(0,4))-Number(birth.slice(0,4));if(date.slice(5)<birth.slice(5))a--;return a;}
 export function match(event,memory){const years=Math.abs(new Date(event.date+'T12:00:00Z')-new Date(memory.date+'T12:00:00Z'))/31557600000;let score=0,reasons=[];if(years<=1){score+=5;reasons.push('发生在这段记忆前后一年内');}else if(years<=3){score+=3;reasons.push('发生在这段记忆前后三年内');}const text=[memory.title,memory.note,memory.category].join(' ');const tag=event.tags.find(t=>text.includes(t));if(tag){score+=3;reasons.push(`与「${tag}」主题相关`);}const place=(memory.place||'').trim();if(place&&event.place!=='全球'&&event.place.split(' ').some(p=>place.includes(p)||p.includes(place))){score+=4;reasons.push(`地点与「${place}」相关`);}return {score,reasons};}
 export function ranked(birth,memories){return HISTORY.filter(h=>h.date>=birth&&h.date<=today()).map(h=>{const links=memories.map(m=>({...match(h,m),memory:m})).filter(m=>m.score>=3).sort((a,b)=>b.score-a.score);return {...h,links,score:links.reduce((s,l)=>s+l.score,0)};}).sort((a,b)=>b.score-a.score||a.date.localeCompare(b.date));}
-export function validateProfile(data){if(!data||!validDate(data.birth)||data.birth<'1900-01-01'||data.birth>today()||typeof data.name!=='string'||data.name.length>30||!Array.isArray(data.memories)||data.memories.length>1000)return false;return data.memories.every(m=>m&&typeof m.id==='string'&&validDate(m.date)&&m.date>=data.birth&&m.date<=today()&&['title','category','place','note'].every(k=>typeof m[k]==='string')&&m.title.trim()&&m.title.length<=80&&m.note.length<=2000&&m.place.length<=80);}
+export function validateProfile(data){if(!data||!validDate(data.birth)||data.birth<'1900-01-01'||data.birth>today()||typeof data.name!=='string'||data.name.length>30||!Array.isArray(data.memories)||data.memories.length>1000)return false;return data.memories.every(m=>m&&typeof m.id==='string'&&validDate(m.date)&&m.date>=data.birth&&m.date<=today()&&['title','category','place','note'].every(k=>typeof m[k]==='string')&&m.title.trim()&&m.title.length<=80&&m.note.length<=2000&&m.place.length<=80&&validOrigin(m.origin));}
+
+function validOrigin(origin){
+  if(origin===undefined)return true;
+  if(!origin||typeof origin!=='object')return false;
+  const limits={platform:80,externalId:200,timestamp:100,url:2048,contentKey:2200,importedAt:40};
+  return Object.entries(limits).every(([key,max])=>typeof origin[key]==='string'&&origin[key].length<=max);
+}
