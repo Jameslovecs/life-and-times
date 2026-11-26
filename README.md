@@ -1,92 +1,111 @@
-# 此生 · 我与时代
+# Cisheng · A Life in Time
 
-一个无需注册、无需 API 密钥的中文个人传记网站。输入生日，记录人生经历，发现与时代历史的连接。
+A Chinese-language personal biography website that connects your memories with world history. Enter your birth date, record life events, and discover the historical context around them. No account or API key required.
 
-## 公开体验
+## Live website
 
-https://jameslovecs.github.io/life-and-times/
+[Try Cisheng](https://jameslovecs.github.io/life-and-times/)
 
-## 已实现
+## Features
 
-- 按出生年月日生成带准确周岁的个人/时代时间轴。
-- 人生经历新增、编辑、删除，支持主题、地点、笔记。
-- 时间、主题、地点的可解释匹配；新增记忆即时更新关联。
-- 全部、个人记忆、相关历史视图与历史主题筛选。
-- 12 条精选历史事件，每条提供可访问的原始机构来源。
-- localStorage 持久化，JSON 导入/导出，清除记录。
-- 独立的虚构示例故事，不覆盖真实个人记录。
-- 响应式布局、原生表单验证、键盘可访问对话框。
+- Generate a personal and historical timeline from your birth date, with birthday-aware ages.
+- Add, edit, and delete memories with topics, locations, and notes.
+- Import social posts from supported JSON, CSV, and X archive files, with editable previews and duplicate detection.
+- Discover explainable connections based on time, topic, and location; associations update as you add memories.
+- Switch between the combined timeline, personal memories, and related history, with historical topic filters.
+- Explore 12 curated historical events, each linked to its original institutional source.
+- Save records in browser local storage, export or import JSON backups, and clear saved data.
+- Explore a fictional example without overwriting your personal records.
+- Use a responsive interface with native form validation and keyboard-accessible dialogs.
 
-## 本地运行
+## Run locally
 
-需要 Python 3。开发测试使用 Node.js 18+。无第三方依赖，无需 npm install。
+Python 3 is required for the local server. The npm commands and tests require Node.js 18 or later. There are no third-party dependencies, so `npm install` is unnecessary.
 
 ```sh
 git clone https://github.com/Jameslovecs/life-and-times.git
 cd life-and-times
 npm start
-# 打开 http://localhost:4173
+# Open http://localhost:4173
+```
+
+Run tests in a separate terminal:
+
+```sh
 npm test
 ```
 
-也可直接运行 `python3 -m http.server 4173 --directory dist`。请通过 HTTP 服务打开，ES modules 不支持直接双击 file:// 文件运行。
+You can also start the server directly with `python3 -m http.server 4173 --directory dist`. Serve the files over HTTP; opening `index.html` directly with a `file://` URL does not support the app's ES module imports.
 
-## 免费部署
+## Free deployment
 
-公开 GitHub 仓库使用 GitHub Pages；`.github/workflows/pages.yml` 在 main 分支推送后自动测试并部署 `dist/`。仓库 Settings → Pages → Source 选择 GitHub Actions。工作流使用 GitHub 自动提供的短期令牌，无需手动创建或保存任何密钥。未启用付费 API、数据库或订阅。
+The public repository uses GitHub Pages. The workflow in `.github/workflows/pages.yml` runs tests and deploys `dist/` after pushes to `main`. In the repository's **Settings → Pages → Source**, select **GitHub Actions**. The workflow uses GitHub's automatically provided short-lived token; no manually created secrets are required. No paid APIs, databases, or subscriptions are enabled.
 
-`dist/` 也可以部署到任何静态 HTTPS 托管服务。本仓库的 `.openai/hosting.json` 记录原项目的 Sites 身份；复制项目时请移除或改为你自己的身份，不要复用原站点 ID。
+You can also deploy `dist/` to any static HTTPS hosting service. The `.openai/hosting.json` file identifies the original Sites project. When copying this project, remove that file or replace its identity with your own; do not reuse the original site ID.
 
-## 数据与隐私
+## Data and privacy
 
-个人记录仅保存在当前域名下的浏览器本地存储 `cisheng-v1`，不提交到服务器。公开网站链接分享的是产品，不是访客的个人传记。无分析脚本、广告或远程字体。访问外部历史来源会打开该来源网站。浏览器清理、无痕会话结束或更换设备可能丢失数据，请定期导出备份。不同托管域名之间的数据不共享，使用 JSON 导出/导入迁移。
+Personal records are stored only in the current site's browser local storage under `cisheng-v1`; they are not submitted to a server. Sharing the public website URL shares the product, not your personal biography. The app includes no analytics scripts, advertisements, or remote fonts. Following a historical source link opens that external website.
 
-## 匹配规则
+Clearing browser data, ending a private browsing session, or changing devices can result in lost records. Export backups regularly. Data is not shared between hosting domains; use JSON export and import to move it.
 
-`dist/engine.js` 实现可测试的纯函数：
-- 人生经历前后 1 年：+5；否则前后 3 年：+3。
-- 主题或记忆文字匹配事件标签：+3。
-- 地点文字匹配：+4。
-- 单条记忆累计至少 3 分，展示关联及每个具体原因。
-- 时间轴按日期排序，只显示出生日至今天的历史。
+## Matching rules
 
-关系表示背景线索，不作因果推断。生日当天没有事件时，不编造同日大事。年龄按生日周年计算，2 月 29 日生日在非闰年 3 月 1 日增加一岁。
+`dist/engine.js` implements the matching logic as testable pure functions:
 
-## 扩充历史库
+- A historical event within one year of a memory: +5 points; otherwise, within three years: +3.
+- A topic or memory text matching an event tag: +3.
+- Matching location text: +4.
+- A match scoring at least 3 points is shown with its specific reasons.
+- The timeline is sorted by date and shows historical events only between your birth date and today.
 
-编辑 `dist/history.js`，每条包含 `date`（真实 ISO 日期）、`title`、`category`（科技/社会/文化/世界）、`place`、`tags`、`text`、`source`、`url`。先核验第一手资料，再编写简短独立概述。不要加入未核实事件，也不要复制长段文章。运行 `npm test` 检查数据和核心规则。
+Connections are contextual clues, not claims of causation. The app does not invent an event when the history dataset has no entry for your birthday. Ages increase on each birthday; for a February 29 birthday, the age increases on March 1 in non-leap years.
 
-## 当前范围与未完成部分
+## Expand the history dataset
 
-这是可用的 MVP，而不是完整历史百科。精选数据覆盖 1945—2024 年的 12 个节点；其他年份可能没有时代条目。不包含实时新闻、生成式 AI、云端同步、账号系统、个人传记公开分享、照片上传或全文传记生成。地点使用文字匹配，尚未接入地理编码，不能识别所有别名。这些扩展不影响当前本地记录与匹配闭环。
+Edit `dist/history.js`. Each entry contains `date` (a verified ISO date), `title`, `category`, `place`, `tags`, `text`, `source`, and `url`. The category values used by the Chinese interface are `科技` (Technology), `社会` (Society), `文化` (Culture), and `世界` (World).
 
-## 验证
+Verify primary sources before writing a short, original summary. Do not add unverified events or copy long article excerpts. Run `npm test` to check the data and core rules.
 
-`npm test` 覆盖日历有效性、生日周岁边界、加入记忆后的关联更新、无关事件、导入边界、来源 URL 格式。浏览器验证记录见 `QA.md`。
+## Current scope and limitations
 
-## 社交动态导入（新增）
+This is a working MVP with a curated dataset, not a complete historical encyclopedia. It contains 12 events from 1945 through 2024; other years may have no historical entries.
 
-在自己的时间轴点击 **导入社交动态**，选择文件或粘贴内容 → **解析并预览** → 校正日期、标题、正文、主题和地点 → 勾选所需条目 → **确认导入**。导入只追加，已有记忆保留；取消不会保存。示例人物不接受真实数据导入，请先建立自己的生日档案。
+The app does not include live news, generative AI, cloud synchronization, accounts, public sharing of personal biographies, photo uploads, or full biography generation. Locations use text matching rather than geocoding, so not all aliases are recognized. These limitations do not prevent local journaling and historical matching.
 
-支持的结构（不保证平台所有历史版本）：
+## Verification
 
-| 格式 | 支持的字段 / 容器 |
+`npm test` covers calendar validation, birthday boundaries, association updates, unrelated events, import validation, and source URL formatting. Social import tests also cover supported export formats and duplicate handling. See [QA.md](QA.md) for browser verification notes.
+
+## Import social posts
+
+On your personal timeline, click **Import social posts** (`导入社交动态`). Select a file or paste content, then click **Parse and preview** (`解析并预览`). Correct dates, titles, text, topics, and locations as needed, select the entries you want, and click **Confirm import** (`确认导入`).
+
+Imports append to your existing memories; they do not replace them. Canceling saves nothing. Importing into the fictional demo profile is disabled, so create your own birth-date profile first.
+
+### Supported formats
+
+These structures are supported; compatibility with every historical export version is not guaranteed.
+
+| Format | Supported fields and containers |
 | --- | --- |
-| X / Twitter | 解压后的 `tweets.js`、`tweet.js`、分片，或 JSON；`tweet.created_at`、`full_text`、`id_str` |
-| Instagram | 帖子 JSON 数组、`ig_posts` / `posts` 容器；`media[].creation_timestamp` 与帖子/媒体 `title` |
-| Facebook | 帖子数组或 `posts` / `your_posts`；`timestamp`、`data[].post` |
-| 通用 JSON | 数组或 `events` / `posts` / `tweets` / `statuses` / `data` / `media`；`date` / `timestamp` / `created_at`，`text` / `content` / `note` / `title` |
-| CSV | `date,text` 列，可选 `platform,id,title,category,place,url`；支持中文日期/正文/地点列名、带引号的逗号、换行和 UTF-8 BOM |
+| X / Twitter | Extracted `tweets.js`, `tweet.js`, archive parts, or JSON; `tweet.created_at`, `full_text`, and `id_str` |
+| Instagram | Post JSON arrays or `ig_posts` / `posts` containers; `media[].creation_timestamp` and post or media `title` |
+| Facebook | Post arrays or `posts` / `your_posts` containers; `timestamp` and `data[].post` |
+| Generic JSON | Arrays or `events` / `posts` / `tweets` / `statuses` / `data` / `media` containers; `date` / `timestamp` / `created_at` and `text` / `content` / `note` / `title` |
+| CSV | `date,text` columns, optionally `platform,id,title,category,place,url`; also supports Chinese date/text/location headers, quoted commas, newlines, and a UTF-8 BOM |
 
-可直接下载网站内的 [JSON 示例](dist/samples/social-events.json) 或 [CSV 模板](dist/samples/social-events.csv)。示例数据为虚构数据。`id` 应使用字符串，避免长整数精度损失。
+Download the [JSON example](dist/samples/social-events.json) or [CSV template](dist/samples/social-events.csv), also available in the import dialog. All sample records are fictional. Use strings for `id` values to avoid precision loss with large integers.
 
-- 时间：`YYYY-MM-DD` 保持原样；有时区的 ISO 时间、X 时间格式、Unix 秒/毫秒转换为 **UTC 日期**。无时区的时间及月日顺序不明确的日期不猜测，请在预览中修正。
-- 上下文：中英文关键词给出可编辑主题建议；导入正文、地点和日期进入既有历史匹配。来源、原始时间戳、原帖 HTTPS 链接保留在记忆的 `origin` 元数据中，也随备份导出；编辑记忆保留来源信息。
-- 去重：同日期同规范化正文（无正文则标题），或同平台同字符串帖子 ID，视为重复；检查本次选择和已保存记录。没有稳定 ID 的帖子若更改了导入日期/原文，可能需手动去重。不同平台的同日同文也合并为重复。
-- 校验：未来日期、早于生日、缺少日期/文字、超长字段会标明原因，可修正后导入。重复项自动跳过。
-- 容量：单文件/粘贴内容 5 MB，最多读取 5,000 条，每页 20 条；全部记忆上限 1,000 条。标题 80 字、正文 2,000 字、地点 80 字；超长正文要求用户缩短，不会静默截断。标题默认取前 80 字，原始正文保留。
-- 保存：本地存储写入成功后才显示成功；存储不足时保留预览并提示，没有部分导入。
-- 安全：只读取 JSON/CSV 数据，X 归档外层赋值用严格模式移除后 JSON.parse，绝不执行归档脚本。导入文字转义显示，原帖链接仅允许不带凭据的 HTTPS。文件不上传，不读取平台令牌。
-- 未实现：OAuth / API 账户直连、定时同步、ZIP 自动解压、截图 OCR、媒体附件。可使用平台导出的文件或将其他数据转成模板格式；仍无需任何付费 API。
+### Import behavior
 
-实现位于 `dist/social-import.js`（解析与审阅）及 `dist/social-import-ui.js`（预览交互）。`tests/social-import.test.js` 使用合成数据覆盖平台格式、CSV、跨时区日期、重复、校正、备份回读和历史关联，不包含真实社交数据或凭据。
+- **Dates:** `YYYY-MM-DD` values remain unchanged. ISO timestamps with time zones, X timestamps, and Unix seconds or milliseconds are converted to **UTC dates**. Timestamps without a time zone and ambiguous month/day formats are not guessed; correct them in the preview.
+- **Context:** Chinese and English keywords suggest editable topics. Imported text, locations, and dates participate in the existing history matching. The platform, original timestamp, and original post's HTTPS link are retained in each memory's `origin` metadata and included in backups. Editing a memory preserves its provenance.
+- **Duplicates:** Entries are duplicates if they share a date and normalized text (or title when text is empty), or a platform and string post ID. Checks cover both the current selection and saved memories. Without a stable ID, changing the imported date or original text may require manual deduplication. Identical same-day text across platforms is also treated as a duplicate.
+- **Validation:** Future dates, dates before your birth, missing dates or text, and oversized fields are flagged with reasons. Correct them before importing. Duplicate entries are skipped automatically.
+- **Limits:** Each file or pasted input can be up to 5 MB and 5,000 records, displayed 20 per page. The profile supports up to 1,000 total memories. Titles are limited to 80 characters, text to 2,000, and locations to 80. Oversized text must be shortened by the user and is not silently truncated. Generated titles use the first 80 characters while preserving the full text in the preview.
+- **Saving:** Success is reported only after local storage is written successfully. If storage is unavailable or full, the preview stays open with an error; the import is not partially saved.
+- **Security:** Files are parsed as data only. A strictly recognized X archive assignment wrapper is removed before `JSON.parse`; archive scripts are never executed. Imported text is escaped for display, and source links allow only HTTPS URLs without embedded credentials. Files are not uploaded, and platform tokens are not read.
+- **Not yet supported:** OAuth or direct API account connections, scheduled synchronization, automatic ZIP extraction, screenshot OCR, and media attachments. Use platform exports or convert other data to the template format. No paid API is needed.
+
+The implementation lives in `dist/social-import.js` (parsing and review) and `dist/social-import-ui.js` (preview interactions). `tests/social-import.test.js` uses synthetic fixtures to cover platform formats, CSV, time-zone boundaries, duplicates, corrections, backup round-trips, and historical associations. It contains no real social data or credentials.
